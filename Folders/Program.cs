@@ -1,34 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Xml.Linq;
 
 public class Folders
 {
     public static IEnumerable<string> FolderNames(string xml, char startingLetter)
     {
-        
+        XDocument xdocument = XDocument.Parse(xml);
+        var folders = xdocument.Descendants("folder");
 
-        List<string> response = new List<string>();
+        var query = from f in folders
+                    where f.Attribute("name").Value.StartsWith(startingLetter.ToString())
+                    select f.Attribute("name").Value;
 
-        
-
-        while (xml.IndexOf("<folder name") != -1)
-        {
-            var index = xml.IndexOf("<folder name");
-            var removeEverythingBeforeFolderName = xml.Substring(index);
-            xml = removeEverythingBeforeFolderName;
-            
-            index = xml.IndexOf("\"") + 1;
-            var removeBeforeQuote = xml.Substring(index);
-            xml = removeBeforeQuote;
-
-            index = xml.IndexOf("\"");
-            var folderName = xml.Substring(0, index);
-            if (folderName[0] == startingLetter)
-                response.Add(folderName);
-        }
- 
-        return response;
+        return query;
     }
 
     public static void Main(string[] args)
